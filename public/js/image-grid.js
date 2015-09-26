@@ -6,6 +6,7 @@
     misc) {
 
   var g = {
+    minSize: 256,
     maxParallelDownloads: 8,
     elem: document.getElementById("grid"),
     viewElem: document.getElementById("viewer"),
@@ -69,45 +70,63 @@
     if (isGif(e.target.src)) {
       sizeToFit(e.target, e.target.width, e.target.height);
     } else {
-      g.viewImg.style.width = "auto";
-      g.viewImg.style.height = "auto";
+      fitWidth(e.target, e.target.width, e.target.height);
     }
   });
 
   g.video.addEventListener('canplay', function(e) {
     makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
   });
+  g.video.addEventListener('error', processNext);
 
   g.image.addEventListener('load', function(e) {
     makeThumbnail(e.target, e.target.width, e.target.height, isGif(e.target.src) ? "gif" : "");
   });
+  g.image.addEventListener('error', processNext);
+
+  function verticallyCenter(height) {
+    var dh = window.innerHeight - height;
+    if (dh > 0) {
+      g.viewElem.style.top = (window.scrollY + dh / 2 | 0) + "px";
+    }
+  }
 
   function sizeToFit(elem, width, height) {
     var w = width  / window.innerWidth;
     var h = height / window.innerHeight;
     if (w < h) {
-      w = width * window.innerHeight / height;
+      w = width * window.innerHeight / height | 0;
       h = window.innerHeight;
     } else {
       w = window.innerWidth;
-      h = height * window.innerWidth / width;
+      h = height * window.innerWidth / width | 0;
     }
     elem.style.width  = w + "px";
     elem.style.height = h + "px";
+    verticallyCenter(h);
+  }
+
+  function fitWidth(elem, width, height) {
+    var w = window.innerWidth;
+    var h = height * w / width | 0;
+    elem.style.width  = w + "px";
+    elem.style.height = h + "px";
+    verticallyCenter(h);
   }
 
   function makeThumbnail(elem, elemWidth, elemHeight, msg) {
-    var imageWidth = g.columnWidth - g.padding;
-    var height = elemHeight * imageWidth / elemWidth | 0;
-    var ctx = g.ctx;
-    ctx.canvas.width = imageWidth;
-    ctx.canvas.height = height;
-    ctx.fillStyle = "white";
-    ctx.textBaseline = "top";
-    ctx.drawImage(elem, 0, 0, imageWidth, height);
-    ctx.fillText(msg, 5, 5);
-    loadImage(elem.src, ctx.canvas.toDataURL());
-    g.videoPending = false;
+    if (isGif(elem.src) || (elemWidth >= g.minSize && elemHeight >= g.minSize)) {
+      var imageWidth = g.columnWidth - g.padding;
+      var height = elemHeight * imageWidth / elemWidth | 0;
+      var ctx = g.ctx;
+      ctx.canvas.width = imageWidth;
+      ctx.canvas.height = height;
+      ctx.fillStyle = "white";
+      ctx.textBaseline = "top";
+      ctx.drawImage(elem, 0, 0, imageWidth, height);
+      ctx.fillText(msg, 5, 5);
+      loadImage(elem.src, ctx.canvas.toDataURL());
+    }
     processNext();
   }
 
