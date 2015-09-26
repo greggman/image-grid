@@ -1,0 +1,22 @@
+{
+  "name": "image-grid",
+  "version": "0.0.0",
+  "description": "Serve grid of images from folder tree",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "image",
+    "images",
+    "thumbnails",
+    "gallery"
+  ],
+  "author": "Gregg Tavares",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.3",
+    "image-size": "^0.3.5",
+    "optionator": "^0.6.0"
+  }
+}
