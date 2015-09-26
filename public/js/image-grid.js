@@ -45,6 +45,10 @@
     return extname(filename).toLowerCase() === ".gif";
   }
 
+  function px(v) {
+    return v + "px";
+  }
+
   io.sendJSON("/images", {}, function(err, images) {
     Array.prototype.push.apply(g.queue, images);
     for (var ii = 0; ii < g.maxParallelDownloads; ++ii) {
@@ -54,30 +58,51 @@
 
   g.viewElem.addEventListener('click', hideImage);
   g.viewVideo.addEventListener('canplay', function(e) {
-    console.log("canplay");
     g.viewVideo.style.display = "inline-block";
+    g.viewImg.style.display = "none";
     sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
     e.target.play();
   });
   g.viewVideo.addEventListener('loadeddata', function(e) {
-    console.log("loadeddata");
     g.viewVideo.style.display = "inline-block";
+    g.viewImg.style.display = "none";
     sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
     e.target.play();
   });
 
   g.viewImg.addEventListener('load', function(e) {
     g.viewImg.style.display = "inline-block";
-
+    g.viewVideo.style.display = "none";
     if (isGif(e.target.src)) {
-      sizeToFit(e.target, e.target.width, e.target.height);
+      sizeToFit(e.target, e.target.naturalWidth, e.target.naturalHeight);
     } else {
-      fitWidth(e.target, e.target.width, e.target.height);
+      fitWidth(e.target, e.target.naturalWidth, e.target.naturalHeight);
     }
   });
 
   g.nextElem.addEventListener('click', gotoNext);
   g.prevElem.addEventListener('click', gotoPrev);
+
+  window.addEventListener('keydown', function(e) {
+    switch (e.keyCode) {
+    case 37: // left
+      gotoPrev(e);
+      break;
+    case 39: // right
+      gotoNext(e);
+      break;
+    case 38: // up
+      e.preventDefault();
+      e.stopPropagation();
+      window.scrollBy(0, window.innerHeight / -4 | 0);
+      break;
+    case 40: // down
+      e.preventDefault();
+      e.stopPropagation();
+      window.scrollBy(0, window.innerHeight / 4 | 0);
+      break;
+    }
+  });
 
   g.video.addEventListener('canplay', function(e) {
     makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
@@ -85,7 +110,7 @@
   g.video.addEventListener('error', processNext);
 
   g.image.addEventListener('load', function(e) {
-    makeThumbnail(e.target, e.target.width, e.target.height, isGif(e.target.src) ? "gif" : "");
+    makeThumbnail(e.target, e.target.naturalWidth, e.target.naturalHeight, isGif(e.target.src) ? "gif" : "");
   });
   g.image.addEventListener('error', processNext);
 
@@ -100,10 +125,9 @@
   }
 
   function gotoPrev(e) {
-console.log("prev");
     e.preventDefault();
     e.stopPropagation();
-    var prev = g.currentElem.prevElementSibling;
+    var prev = g.currentElem.previousElementSibling;
     if (!prev) {
       prev = g.currentElem.parentNode.lastElementChild;
     }
@@ -112,9 +136,8 @@ console.log("prev");
 
   function verticallyCenter(height) {
     var dh = window.innerHeight - height;
-    if (dh > 0) {
-      g.viewElem.style.top = (window.scrollY + dh / 2 | 0) + "px";
-    }
+    g.viewElem.style.top = px(window.scrollY + ((dh > 0) ? (dh / 2 | 0) : 0));
+    g.viewElem.style.display = "block";
   }
 
   function sizeToFit(elem, width, height) {
@@ -127,16 +150,16 @@ console.log("prev");
       w = window.innerWidth;
       h = height * window.innerWidth / width | 0;
     }
-    elem.style.width  = w + "px";
-    elem.style.height = h + "px";
+    elem.style.width  = px(w);
+    elem.style.height = px(h);
     verticallyCenter(h);
   }
 
   function fitWidth(elem, width, height) {
     var w = window.innerWidth;
     var h = height * w / width | 0;
-    elem.style.width  = w + "px";
-    elem.style.height = h + "px";
+    elem.style.width  = px(w);
+    elem.style.height = px(h);
     verticallyCenter(h);
   }
 
@@ -173,7 +196,7 @@ console.log("prev");
   function loadImage(src, url) {
     var img = new Image();
     img.addEventListener('load', function() {
-      addElement(img, img.width, img.height);
+      addElement(img, img.naturalWidth, img.naturalHeight);
     });
     img.addEventListener('click', function() {
       viewImage(img);
@@ -183,36 +206,30 @@ console.log("prev");
   }
 
   function hideImage() {
-console.log("hide");
     g.viewElem.style.display = "none";
     g.viewVideo.pause();
   }
 
-  function viewImage(img) {
-    g.viewElem.style.display = "block";
-    g.viewElem.style.top = window.scrollY + "px";
+  function viewImage(img, noHide) {
     var url = img.origSrc;
     g.currentElem = img;
     if (isVideoExtension(url)) {
       g.viewVideo.pause();
       g.viewVideo.src = url;
-      g.viewVideo.style.display = "inline-block";
-      g.viewVideo.style.display = "none";
       g.viewVideo.currentTime = 0;
       g.viewVideo.load();
-      g.viewImg.style.display = "none";
     } else {
       g.viewImg.src = url;
-      g.viewImg.style.display = "inline-block";
-      g.viewImg.style.display = "none";
       g.viewVideo.pause();
-      g.viewVideo.style.display = "none";
     }
   }
 
   function addElement(elem, elemWidth, elemHeight) {
     g.images.push(elem);
     g.elem.appendChild(elem);
+    if (!g.currentElem) {
+      g.currentElem = elem;
+    }
     flowElement(elem, elemWidth, elemHeight);
   }
 
@@ -223,11 +240,10 @@ console.log("hide");
     var style = elem.style;
     style.position = "absolute";
     style.display = "block";
-    var left =(column.ndx * g.columnWidth) + "px";
-    style.left  = left;
-    style.top   = (column.bottom) + "px";
-    style.width = (imageWidth) + "px";
-    style.height = (height) + "px";
+    style.left  = px(column.ndx * g.columnWidth);
+    style.top   = px(column.bottom);
+    style.width = px(imageWidth);
+    style.height = px(height);
     column.bottom += height + g.padding;
   }
 
@@ -245,7 +261,7 @@ console.log("hide");
   function reflow() {
     var width = g.elem.parentNode.clientWidth;
     var numColumns = (width / g.columnWidth | 0) || 1;
-    g.elem.style.width = (numColumns * g.columnWidth - g.padding) + "px";
+    g.elem.style.width = px(numColumns * g.columnWidth - g.padding);
     g.columns = [];
     for (var ii = 0; ii < numColumns; ++ii) {
       g.columns.push({
@@ -256,7 +272,7 @@ console.log("hide");
 
     g.images.forEach(function(elem) {
       if (elem instanceof HTMLImageElement) {
-        flowElement(elem, elem.width, elem.height);
+        flowElement(elem, elem.naturalWidth, elem.naturalHeight);
       } else {
         flowElement(elem, elem.videoWidth, elem.viewHeight);
       }
