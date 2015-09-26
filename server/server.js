@@ -39,8 +39,8 @@ var readDirTree = require('../lib/readdirtree');
 
 var optionSpec = {
   options: [
+    { option: 'port', alias: 'p', type: 'Int', description: "port to serve on", default: "8080", },
     { option: 'help', alias: 'h', type: 'Boolean',  description: 'displays help'},
-    { option: 'dirPath',          type: 'String',   description: 'path to get images from', required: true},
   ],
   helpStyle: {
     typeSeparator: '=',
@@ -58,28 +58,60 @@ var imageExtensions = {
   ".gif": true,
 };
 
-function init(options) {
-  var files = readDirTree.sync(options.dirPath);
-  var images = files.filter(isImageExtension).map(function(image) {
-      return path.join("images", image).replace(/\\/g, '/');
-  });
-  var imageResponse = JSON.stringify(images);
+var videoExtensions = {
+  ".webm": true,
+  ".mp4": true,
+};
 
+function init(options) {
   var app = express();
+
+  var images = [];
+  options._.forEach(function(dirPath, ndx) {
+    var files = readDirTree.sync(dirPath);
+    images = images.concat(files.filter(isImageOrVideoExtension).map(function(image) {
+      return path.join("images", ndx.toString(), image).replace(/\\/g, '/');
+    }));
+    console.log(dirPath, "images:", images.length);
+    app.use('/images/' + ndx, express.static(path.resolve(dirPath)));
+  });
+
+  var imageResponse = JSON.stringify(images);
   app.post('/images', function(req, res) {
     res.type('application/json').send(imageResponse);
   });
-  app.use('/images', express.static(path.resolve(options.dirPath)));
   app.use(express.static(path.join(__dirname, "..", "public")));
 
   var server = http.createServer(app);
-  server.listen(8080);
+  server.on('error', serverErrorHandler);
+  server.on('listening', serverListeningHandler);
+  tryToStartServer();
+
+  function serverListeningHandler() {
+    console.log("Go To http://localhost:", options.port);
+  };
+
+  function serverErrorHandler() {
+    ++options.port;
+    tryToStartServer();
+  };
+
+  function tryToStartServer() {
+    server.listen(options.port);
+  }
 }
 
 function isImageExtension(filename) {
-  return imageExtensions[path.extname(filename)];
+  return imageExtensions[path.extname(filename).toLowerCase()];
 }
 
+function isVideoExtension(filename) {
+  return videoExtensions[path.extname(filename).toLowerCase()];
+}
+
+function isImageOrVideoExtension(filename) {
+  return isImageExtension(filename) || isVideoExtension(filename);
+}
 
 try {
   var args = optionator.parse(process.argv);
