@@ -15,12 +15,30 @@
         display: none;
         position: absolute;
         z-index: 2;
-        background-color: rgba(0,0,0,0.5);
         width: 100%;
         height: 100%;
         text-align: center;
     }
+    #back {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0,0,0,0.7);
+        width: 100%;
+        height: 100%;
+    }
+    #view-holder {
+        position: absolute;
+        top: 0;
+        lefT: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+    }
     #viewer-img {
+        max-width: 100%;
+    }
+    #viewer-video {
         max-width: 100%;
     }
   </style>
@@ -30,8 +48,11 @@
 
 </div>
 <div id="viewer">
-    <img id="viewer-img" />
-    <video id="viewer-video" autoplay controls loop />
+    <div id="back"></div>
+    <div id="view-holder">
+      <img id="viewer-img" />
+      <video id="viewer-video" autoplay controls loop />
+    </div>
 </div>
 </body>
 <script data-main="js/image-grid.js" src="3rdparty/require.js"></script>

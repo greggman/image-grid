@@ -6,6 +6,7 @@
     misc) {
 
   var g = {
+    maxParallelDownloads: 8,
     elem: document.getElementById("grid"),
     viewElem: document.getElementById("viewer"),
     viewImg: document.getElementById("viewer-img"),
@@ -20,7 +21,7 @@
     image: document.createElement("img"),
   };
 
-  misc.applyUrlSettings(g);
+  misc.applyUrlSettingsDirect(g);
 
   function extname(path) {
     var pndx = path.lastIndexOf('.');
@@ -37,37 +38,74 @@
   function isVideoExtension(filename) {
     return videoExtensions[extname(filename).toLowerCase()];
   }
+  function isGif(filename) {
+    return extname(filename).toLowerCase() === ".gif";
+  }
 
   io.sendJSON("/images", {}, function(err, images) {
     Array.prototype.push.apply(g.queue, images);
-    processNext();
+    for (var ii = 0; ii < g.maxParallelDownloads; ++ii) {
+      processNext();
+    }
   });
 
   g.viewElem.addEventListener('click', hideImage);
   g.viewVideo.addEventListener('canplay', function(e) {
     console.log("canplay");
+    g.viewVideo.style.display = "inline-block";
+    sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
     e.target.play();
   });
   g.viewVideo.addEventListener('loadeddata', function(e) {
     console.log("loadeddata");
+    g.viewVideo.style.display = "inline-block";
+    sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
     e.target.play();
   });
 
+  g.viewImg.addEventListener('load', function(e) {
+    g.viewImg.style.display = "inline-block";
+
+    if (isGif(e.target.src)) {
+      sizeToFit(e.target, e.target.width, e.target.height);
+    } else {
+      g.viewImg.style.width = "auto";
+      g.viewImg.style.height = "auto";
+    }
+  });
+
   g.video.addEventListener('canplay', function(e) {
-    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight);
+    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
   });
 
   g.image.addEventListener('load', function(e) {
-    makeThumbnail(e.target, e.target.width, e.target.height);
+    makeThumbnail(e.target, e.target.width, e.target.height, isGif(e.target.src) ? "gif" : "");
   });
 
-  function makeThumbnail(elem, elemWidth, elemHeight) {
+  function sizeToFit(elem, width, height) {
+    var w = width  / window.innerWidth;
+    var h = height / window.innerHeight;
+    if (w < h) {
+      w = width * window.innerHeight / height;
+      h = window.innerHeight;
+    } else {
+      w = window.innerWidth;
+      h = height * window.innerWidth / width;
+    }
+    elem.style.width  = w + "px";
+    elem.style.height = h + "px";
+  }
+
+  function makeThumbnail(elem, elemWidth, elemHeight, msg) {
     var imageWidth = g.columnWidth - g.padding;
     var height = elemHeight * imageWidth / elemWidth | 0;
     var ctx = g.ctx;
     ctx.canvas.width = imageWidth;
     ctx.canvas.height = height;
+    ctx.fillStyle = "white";
+    ctx.textBaseline = "top";
     ctx.drawImage(elem, 0, 0, imageWidth, height);
+    ctx.fillText(msg, 5, 5);
     loadImage(elem.src, ctx.canvas.toDataURL());
     g.videoPending = false;
     processNext();
@@ -112,12 +150,14 @@
       g.viewVideo.pause();
       g.viewVideo.src = url;
       g.viewVideo.style.display = "inline-block";
+      g.viewVideo.style.display = "none";
       g.viewVideo.currentTime = 0;
       g.viewVideo.load();
       g.viewImg.style.display = "none";
     } else {
       g.viewImg.src = url;
       g.viewImg.style.display = "inline-block";
+      g.viewImg.style.display = "none";
       g.viewVideo.pause();
       g.viewVideo.style.display = "none";
     }

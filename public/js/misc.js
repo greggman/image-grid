@@ -174,6 +174,24 @@ define(function() {
     return dst;
   };
 
+  var applyUrlSettingsDirect = function(opt_obj) {
+    var dst = opt_obj || {};
+    var src = parseUrlQuery();
+    Object.keys(src).forEach(function(key) {
+      var value = src[key];
+      var float = parseFloat(value);
+      if (!isNaN(float)) {
+        dst[key] = float;
+      } else if (value === "true") {
+        dst[key] = true;
+      } else if (value === "false") {
+        dst[key] = false;
+      } else {
+        dst[key] = value;
+      }
+    });
+  };
+
   /**
    * Gets a function checking for prefixed versions
    *
@@ -499,6 +517,7 @@ define(function() {
   return {
     applyObject: applyObject,
     applyUrlSettings: applyUrlSettings,
+    applyUrlSettingsDirect: applyUrlSettingsDirect,
     applyListeners: applyListeners,
     clamp: clamp,
     clampPlusMinus: clampPlusMinus,
