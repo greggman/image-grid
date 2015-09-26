@@ -32,6 +32,7 @@
   var videoExtensions = {
     ".webm": true,
     ".mp4": true,
+    ".ogv": true,
   };
   function isVideoExtension(filename) {
     return videoExtensions[extname(filename).toLowerCase()];

@@ -57,11 +57,13 @@ var imageExtensions = {
   ".jpeg": true,
   ".png": true,
   ".gif": true,
+  ".webp": true,
 };
 
 var videoExtensions = {
   ".webm": true,
   ".mp4": true,
+  ".ogv": true,
 };
 
 function init(options) {
