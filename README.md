@@ -42,6 +42,24 @@ Note: you can pass multiple paths
 
     node index.js path/to/images path/to/more/images path/to/yet/more/images
 
+## Settings
+
+Viewer settings can be set in the URL by adding `?setting=value&setting=value`. For example
+`http://localhost:8080?columnWidth=300` will make the columns 300 pixels wide instead of the default 160.
+
+### `columnWidth`
+
+the width of a column in css pixels. The default is 160
+
+### `minSize`
+
+any image below this size is not displayed. The default is 256. Note gifs ignore this rule
+
+### `padding`
+
+amount of padding to put between images. The default is 10.
+
+
 ## License
 
 MIT
