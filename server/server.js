@@ -39,8 +39,9 @@ var readDirTree = require('../lib/readdirtree');
 
 var optionSpec = {
   options: [
-    { option: 'port', alias: 'p', type: 'Int', description: "port to serve on", default: "8080", },
-    { option: 'help', alias: 'h', type: 'Boolean',  description: 'displays help'},
+    { option: 'port', alias: 'p', type: 'Int',     description: "port to serve on", default: "8080", },
+    { option: 'host',             type: 'String',  description: "host to serve on. Use 0.0.0.0 to publically serve", default: "localhost", },
+    { option: 'help', alias: 'h', type: 'Boolean', description: 'displays help'},
   ],
   helpStyle: {
     typeSeparator: '=',
@@ -88,7 +89,7 @@ function init(options) {
   tryToStartServer();
 
   function serverListeningHandler() {
-    console.log("Go To http://localhost:", options.port);
+    console.log("Go To http://" + options.host + ":" + options.port);
   };
 
   function serverErrorHandler() {
@@ -97,7 +98,7 @@ function init(options) {
   };
 
   function tryToStartServer() {
-    server.listen(options.port);
+    server.listen(options.port, options.host);
   }
 }
 
