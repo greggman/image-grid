@@ -4,6 +4,8 @@ A simple image-grid for displaying images like this
 
 <img src="images/screenshot-01.jpg" />
 
+Effectively the same as tumblr's archive view.
+
 Nearly all processing happens in the browser. A simple node server gets a list of
 images from one or more folder trees. It then serves those images and a simple viewer.
 
