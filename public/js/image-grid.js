@@ -203,7 +203,7 @@
     for (var ii = 0; ii < numColumns; ++ii) {
       g.columns.push({
         ndx: ii,
-        bottom: 0,
+        bottom: g.padding,
       });
     }
 
