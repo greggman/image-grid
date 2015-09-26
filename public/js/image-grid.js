@@ -12,6 +12,8 @@
     viewElem: document.getElementById("viewer"),
     viewImg: document.getElementById("viewer-img"),
     viewVideo: document.getElementById("viewer-video"),
+    nextElem: document.getElementById("next"),
+    prevElem: document.getElementById("prev"),
     ctx: document.createElement("canvas").getContext("2d"),
     columnWidth: 160,
     padding: 10,
@@ -74,6 +76,9 @@
     }
   });
 
+  g.nextElem.addEventListener('click', gotoNext);
+  g.prevElem.addEventListener('click', gotoPrev);
+
   g.video.addEventListener('canplay', function(e) {
     makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
   });
@@ -83,6 +88,27 @@
     makeThumbnail(e.target, e.target.width, e.target.height, isGif(e.target.src) ? "gif" : "");
   });
   g.image.addEventListener('error', processNext);
+
+  function gotoNext(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var next = g.currentElem.nextElementSibling;
+    if (!next) {
+      next = g.currentElem.parentNode.firstElementChild;
+    }
+    viewImage(next);
+  }
+
+  function gotoPrev(e) {
+console.log("prev");
+    e.preventDefault();
+    e.stopPropagation();
+    var prev = g.currentElem.prevElementSibling;
+    if (!prev) {
+      prev = g.currentElem.parentNode.lastElementChild;
+    }
+    viewImage(prev);
+  }
 
   function verticallyCenter(height) {
     var dh = window.innerHeight - height;
@@ -157,6 +183,7 @@
   }
 
   function hideImage() {
+console.log("hide");
     g.viewElem.style.display = "none";
     g.viewVideo.pause();
   }
@@ -165,6 +192,7 @@
     g.viewElem.style.display = "block";
     g.viewElem.style.top = window.scrollY + "px";
     var url = img.origSrc;
+    g.currentElem = img;
     if (isVideoExtension(url)) {
       g.viewVideo.pause();
       g.viewVideo.src = url;

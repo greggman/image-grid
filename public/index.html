@@ -30,29 +30,42 @@
     #view-holder {
         position: absolute;
         top: 0;
-        lefT: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         z-index: 3;
-
-        display: flex;
-        display: -webkit-flex;
-
-        flex-flow: column;
-        -webkit-flex-flow: column;
-
-        justify-content: center;
-        align-content: center;
-        align-items: center;
-        -webkit-justify-content: center;
-        -webkit-align-content: center;
-        -webkit-align-items: center;
     }
     #viewer-img {
         max-width: 100%;
     }
     #viewer-video {
         max-width: 100%;
+    }
+    #next, #prev {
+        position: absolute;
+        top: 0;
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+        font-family: monospace;
+        font-size: 200px;
+        height: 100%;
+        width: 10%;
+        color: rgba(255,255,255,0);
+        background-color: rgba(255,0,0,0);
+        z-index: 4;
+    }
+    #next:hover, #prev:hover {
+        color: rgba(255,255,255,0.3);
+        background-color: rgba(0,0,0,0.1);
+    }
+    #prev {
+        left: 0;
+    }
+    #next {
+        right: 0;
     }
   </style>
 </head>
@@ -64,7 +77,9 @@
     <div id="back"></div>
     <div id="view-holder">
       <img id="viewer-img" />
-      <video id="viewer-video" autoplay controls loop />
+      <video id="viewer-video" autoplay controls loop></video>
+      <div id="prev"><div>&lt;</div></div>
+      <div id="next"><div>&gt;</div></div>
     </div>
 </div>
 </body>
