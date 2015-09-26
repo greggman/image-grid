@@ -18,4 +18,26 @@ the browser makes thumbmails.
 
 It was just the quickest way of getting an image browser in the format I wanted.
 
+## Installing
+
+1.  Install node.js [from here](http://nodejs.org/en/download/).
+2.  Download or clone this repo.
+3.  cd to the repo and type `npm install`
+
+## Running
+
+type
+
+    node index.js path/to/images
+
+Then open a browser and go to `http://localhost:8080`
+
+Note: you can pass multiple paths
+
+    node index.js path/to/images path/to/more/images path/to/yet/more/images
+
+## License
+
+MIT
+
 
