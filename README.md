@@ -2,7 +2,7 @@
 
 A simple image-grid for displaying images like this
 
-<img src="images/screenshot-01.jpg" width="50%" />
+<img src="images/screenshot-01.jpg" />
 
 Nearly all processing happens in the browser. A simple node server gets a list of
 images from 1 or more folder trees. It then serves those images and a simple viewer.
