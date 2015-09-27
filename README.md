@@ -10,17 +10,17 @@ Nearly all processing happens in the browser. A simple node server gets a list o
 images from one or more folder trees. It then serves those images and a simple viewer.
 
 The viewer reads the list of images and then proceeds to download each one, generate
-a thumbnail an place the thumbnails in columns.
+a thumbnail and place the thumbnails in columns.
 
 Click an image to see it larger. Click again to close.
 
 Videos are also supported.
 
-Note: This system is meant to display files on your local machine for you to browse your
+**Note:** This system is meant to display files on your local machine for you to browse your
 own images. It is not meant to publically serve images. If that's what you want you
-would want to generate thumbnail on the server so you can send the smallest amount of
-data possible. This on other hand always ends the full res images to the browser and
-the browser makes thumbmails.
+would want to generate thumbnails on the server so you can send the smallest amount of
+data possible. This on other hand always sends the full res images to the browser and
+the browser makes thumbnails.
 
 It was just the quickest way of getting an image browser in the format I wanted.
 
@@ -38,7 +38,7 @@ type
 
 Then open a browser and go to `http://localhost:8080`
 
-Note: you can pass multiple paths
+**Note:** you can pass multiple paths
 
     node index.js path/to/images path/to/more/images path/to/yet/more/images
 
