@@ -24,6 +24,7 @@
   g.prevElem = $("prev");
   g.wElem = $("w");
   g.hElem = $("h");
+  g.uiElem = $("ui");
   g.ctx = document.createElement("canvas").getContext("2d");
   g.images = [];
   g.columns = [];
@@ -277,10 +278,12 @@
       g.viewVideo.currentTime = 0;
       g.viewVideo.load();
       g.displayElem = g.viewVideo;
+      g.uiElem.style.display = "none";
     } else {
       g.viewImg.src = url;
       g.viewVideo.pause();
       g.displayElem = g.viewImg;
+      g.uiElem.style.display = isGif(url) ? "none" : "block";
     }
   }
 
