@@ -16,6 +16,7 @@
     prevElem: document.getElementById("prev"),
     ctx: document.createElement("canvas").getContext("2d"),
     columnWidth: 160,
+    fitHeight: true,
     padding: 10,
     images: [],
     columns: [],
@@ -73,7 +74,7 @@
   g.viewImg.addEventListener('load', function(e) {
     g.viewImg.style.display = "inline-block";
     g.viewVideo.style.display = "none";
-    if (isGif(e.target.src)) {
+    if (isGif(e.target.src) || g.fitHeight) {
       sizeToFit(e.target, e.target.naturalWidth, e.target.naturalHeight);
     } else {
       fitWidth(e.target, e.target.naturalWidth, e.target.naturalHeight);

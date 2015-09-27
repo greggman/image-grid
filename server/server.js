@@ -33,7 +33,6 @@
 
 var express = require('express');
 var http = require('http');
-var imageSize = require('image-size');
 var path = require('path');
 var readDirTree = require('../lib/readdirtree');
 
