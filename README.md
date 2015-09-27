@@ -42,6 +42,15 @@ Note: you can pass multiple paths
 
     node index.js path/to/images path/to/more/images path/to/yet/more/images
 
+## Usage
+
+*   Click an image to view it.
+*   Click again to close.
+*   Click on left of window to go to previous image (or press ⇦)
+*   Click on right of window to go to next image (or press ⇨)
+*   Click on `<->` to switch between stretching the width to fill the window
+*   Click on `^-V` to switch between stretching the height to fill the window
+
 ## Settings
 
 Viewer settings can be set in the URL by adding `?setting=value&setting=value`. For example
