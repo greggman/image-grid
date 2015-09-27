@@ -5,25 +5,32 @@
     io,
     misc) {
 
+  var $ = document.getElementById.bind(document);
+
   var g = {
     minSize: 256,
     maxParallelDownloads: 8,
-    elem: document.getElementById("grid"),
-    viewElem: document.getElementById("viewer"),
-    viewImg: document.getElementById("viewer-img"),
-    viewVideo: document.getElementById("viewer-video"),
-    nextElem: document.getElementById("next"),
-    prevElem: document.getElementById("prev"),
-    ctx: document.createElement("canvas").getContext("2d"),
     columnWidth: 160,
-    fitHeight: true,
+    widthMode: 1,    // 0 = leave as is, 1 = fitWidth
+    heightMode: 1,   // 0 = leave as is, 1 = fitHeight
     padding: 10,
-    images: [],
-    columns: [],
-    queue: [],
-    video: document.createElement("video"),
-    image: document.createElement("img"),
   };
+
+  g.elem = $("grid");
+  g.viewElem = $("viewer");
+  g.viewImg = $("viewer-img");
+  g.viewVideo = $("viewer-video");
+  g.nextElem = $("next");
+  g.prevElem = $("prev");
+  g.wElem = $("w");
+  g.hElem = $("h");
+  g.ctx = document.createElement("canvas").getContext("2d");
+  g.images = [];
+  g.columns = [];
+  g.queue = [];
+  g.video = document.createElement("video");
+  g.image = document.createElement("img");
+  g.viewing = false;
 
   misc.applyUrlSettingsDirect(g);
 
@@ -74,15 +81,47 @@
   g.viewImg.addEventListener('load', function(e) {
     g.viewImg.style.display = "inline-block";
     g.viewVideo.style.display = "none";
-    if (isGif(e.target.src) || g.fitHeight) {
-      sizeToFit(e.target, e.target.naturalWidth, e.target.naturalHeight);
-    } else {
-      fitWidth(e.target, e.target.naturalWidth, e.target.naturalHeight);
-    }
+    adjustSize(e.target, e.target.naturalWidth, e.target.naturalHeight);
   });
+
+  function adjustSize(elem, elemWidth, elemHeight) {
+    var sizeBoth = g.widthMode && g.heightMode;
+    if (isGif(elem.src) || sizeBoth) {
+      sizeToFit(elem, elemWidth, elemHeight);
+    } else if (g.widthMode) {
+      fitWidth(elem, elemWidth, elemHeight);
+    } else if (g.heightMode) {
+      fitHeight(elem, elemWidth, elemHeight);
+    } else {
+      actualSize(elem, elemWidth, elemHeight);
+    }
+  }
 
   g.nextElem.addEventListener('click', gotoNext);
   g.prevElem.addEventListener('click', gotoPrev);
+  g.wElem.addEventListener('click', changeWidthMode);
+  g.hElem.addEventListener('click', changeHeightMode);
+
+  function changeWidthMode(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    g.widthMode = (g.widthMode + 1) % 2;
+    updateDisplayElem();
+  }
+
+  function changeHeightMode(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    g.heightMode = (g.heightMode + 1) % 2;
+    updateDisplayElem();
+  }
+
+  function updateDisplayElem() {
+    adjustSize(
+        g.displayElem,
+        g.displayElem.naturalWidth  || g.displayElem.videoWidth,
+        g.displayElem.naturalHeight || g.displayElem.videoHeight);
+  }
 
   window.addEventListener('keydown', function(e) {
     switch (e.keyCode) {
@@ -141,6 +180,14 @@
     g.viewElem.style.display = "block";
   }
 
+  function actualSize(elem, width, height) {
+    var w = width;
+    var h = height;
+    elem.style.width  = px(w);
+    elem.style.height = px(h);
+    verticallyCenter(h);
+  }
+
   function sizeToFit(elem, width, height) {
     var w = width  / window.innerWidth;
     var h = height / window.innerHeight;
@@ -159,6 +206,14 @@
   function fitWidth(elem, width, height) {
     var w = window.innerWidth;
     var h = height * w / width | 0;
+    elem.style.width  = px(w);
+    elem.style.height = px(h);
+    verticallyCenter(h);
+  }
+
+  function fitHeight(elem, width, height) {
+    var h = window.innerHeight;
+    var w = width * h / height | 0;
     elem.style.width  = px(w);
     elem.style.height = px(h);
     verticallyCenter(h);
@@ -209,9 +264,11 @@
   function hideImage() {
     g.viewElem.style.display = "none";
     g.viewVideo.pause();
+    g.viewing = false;
   }
 
   function viewImage(img, noHide) {
+    g.viewing = true;
     var url = img.origSrc;
     g.currentElem = img;
     if (isVideoExtension(url)) {
@@ -219,9 +276,11 @@
       g.viewVideo.src = url;
       g.viewVideo.currentTime = 0;
       g.viewVideo.load();
+      g.displayElem = g.viewVideo;
     } else {
       g.viewImg.src = url;
       g.viewVideo.pause();
+      g.displayElem = g.viewImg;
     }
   }
 
@@ -278,6 +337,10 @@
         flowElement(elem, elem.videoWidth, elem.viewHeight);
       }
     });
+
+    if (g.viewing) {
+      updateDisplayElem();
+    }
   }
 
   window.addEventListener('resize', reflow);

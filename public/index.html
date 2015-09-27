@@ -67,6 +67,23 @@
     #next {
         right: 0;
     }
+    #ui {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+        font-family: monospace;
+        font-size: 20px;
+        color: rgba(255,255,255,0.3);
+        cursor: pointer;
+    }
+    #h {
+        transform: rotate(90deg);
+    }
+    #w:hover, #h:hover {
+      color: rgba(255,255,255,0.8);
+      background-color: rgba(0, 0, 0, 0.5);
+    }
   </style>
 </head>
 <body>
@@ -80,6 +97,9 @@
       <video id="viewer-video" autoplay controls loop></video>
       <div id="prev"><div>&lt;</div></div>
       <div id="next"><div>&gt;</div></div>
+      <div id="ui">
+        <div id="w">&lt;-&gt;</div>&nbsp;<div id="h">&lt;-&gt;</div>
+      </div>
     </div>
 </div>
 </body>
