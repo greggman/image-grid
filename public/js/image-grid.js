@@ -287,7 +287,7 @@
     g.viewing = true;
     var url = img.origSrc;
     g.currentElem = img;
-    g.infoNode.nodeValue = url.substr(window.location.origin.length + "/images/".length);
+    g.infoNode.nodeValue = decodeURIComponent(url).substr(window.location.origin.length + "/images/".length);
     if (isVideoExtension(url)) {
       g.viewVideo.pause();
       g.viewVideo.src = url;
