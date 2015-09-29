@@ -11,27 +11,33 @@
     minSize: 256,
     maxParallelDownloads: 8,
     columnWidth: 160,
-    widthMode: 1,    // 0 = leave as is, 1 = fitWidth
-    heightMode: 1,   // 0 = leave as is, 1 = fitHeight
+    stretchMode: 3,
     padding: 10,
     maxSeekTime: 30,
+    rotation: 0,
   };
+  window.g = g;
 
   g.elem = $("grid");
   g.viewElem = $("viewer");
   g.viewImg = $("viewer-img");
   g.viewVideo = $("viewer-video");
+  g.viewContent = $("viewer-content");
   g.nextElem = $("next");
   g.prevElem = $("prev");
-  g.wElem = $("w");
-  g.hElem = $("h");
+  g.stretchElem = $("stretch");
+  g.rotateElem = $("rotate");
+  g.stretchImages = [
+    $("stretch-0"),
+    $("stretch-1"),
+    $("stretch-2"),
+    $("stretch-3"),
+  ];
   g.uiElem = $("ui");
   g.ctx = document.createElement("canvas").getContext("2d");
   g.images = [];
   g.columns = [];
   g.queue = [];
-  g.video = document.createElement("video");
-  g.image = document.createElement("img");
   g.infoNode = document.createTextNode("");
   g.viewing = false;
 
@@ -65,7 +71,7 @@
   io.sendJSON("/images", {}, function(err, images) {
     Array.prototype.push.apply(g.queue, images);
     for (var ii = 0; ii < g.maxParallelDownloads; ++ii) {
-      processNext();
+      createLoadElements();
     }
   });
 
@@ -73,59 +79,72 @@
   g.viewVideo.addEventListener('canplay', function(e) {
     g.viewVideo.style.display = "inline-block";
     g.viewImg.style.display = "none";
-    sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
+    adjustSize(g.viewVideo, getOriginalSize(g.viewVideo));
     e.target.play();
   });
   g.viewVideo.addEventListener('loadeddata', function(e) {
     g.viewVideo.style.display = "inline-block";
     g.viewImg.style.display = "none";
-    sizeToFit(g.viewVideo, g.viewVideo.videoWidth, g.viewVideo.videoHeight);
+    adjustSize(g.viewVideo, getOriginalSize(g.viewVideo));
     e.target.play();
   });
 
   g.viewImg.addEventListener('load', function(e) {
     g.viewImg.style.display = "inline-block";
     g.viewVideo.style.display = "none";
-    adjustSize(e.target, e.target.naturalWidth, e.target.naturalHeight);
+    adjustSize(e.target, getOriginalSize(e.target));
   });
 
-  function adjustSize(elem, elemWidth, elemHeight) {
-    var sizeBoth = g.widthMode && g.heightMode;
-    if (isGif(elem.src) || sizeBoth) {
-      sizeToFit(elem, elemWidth, elemHeight);
-    } else if (g.widthMode) {
-      fitWidth(elem, elemWidth, elemHeight);
-    } else if (g.heightMode) {
-      fitHeight(elem, elemWidth, elemHeight);
+  function adjustSize(elem, orig) {
+    var sizeBoth = g.stretchMode === 3;
+    if (/*isGif(elem.src) ||*/ sizeBoth) {
+      sizeToFit(elem, orig);
+    } else if (g.stretchMode & 0x1) {
+      (isRotated90() ? fitHeight : fitWidth).call(null, elem, orig);
+    } else if (g.stretchMode & 0x2) {
+      (isRotated90() ? fitWidth : fitHeight).call(null, elem, orig);
     } else {
-      actualSize(elem, elemWidth, elemHeight);
+      actualSize(elem, orig);
     }
   }
 
   g.nextElem.addEventListener('click', gotoNext);
   g.prevElem.addEventListener('click', gotoPrev);
-  g.wElem.addEventListener('click', changeWidthMode);
-  g.hElem.addEventListener('click', changeHeightMode);
+  g.stretchElem.addEventListener('click', changeStretchMode);
+  g.rotateElem.addEventListener('click', rotate);
+  updateStretch();
 
-  function changeWidthMode(e) {
+  function updateStretch() {
+    g.stretchImages.forEach(function(img, ndx) {
+      img.style.display = (ndx === g.stretchMode) ? "inline-block" : "none";
+    });
+  }
+
+  function changeStretchMode(e) {
     e.preventDefault();
     e.stopPropagation();
-    g.widthMode = (g.widthMode + 1) % 2;
+    g.stretchMode = (g.stretchMode + 1) % 4;
+    updateStretch();
     updateDisplayElem();
   }
 
-  function changeHeightMode(e) {
+  function rotate(e) {
     e.preventDefault();
     e.stopPropagation();
-    g.heightMode = (g.heightMode + 1) % 2;
+    g.rotation = (g.rotation + 90) % 360;
+//    g.viewContent.style.transform = "rotate(" + g.rotation + "deg)";
     updateDisplayElem();
+  }
+
+  function getOriginalSize(elem) {
+    return {
+      width:  elem.naturalWidth  || elem.videoWidth,
+      height: elem.naturalHeight || elem.videoHeight,
+    };
   }
 
   function updateDisplayElem() {
-    adjustSize(
-        g.displayElem,
-        g.displayElem.naturalWidth  || g.displayElem.videoWidth,
-        g.displayElem.naturalHeight || g.displayElem.videoHeight);
+    adjustSize(g.displayElem, getOriginalSize(g.displayElem));
   }
 
   window.addEventListener('keydown', function(e) {
@@ -149,25 +168,42 @@
     }
   });
 
-  g.video.addEventListener('loadedmetadata', function(e) {
-    var seekTime = Math.min(g.maxSeekTime, e.target.duration / 2);
-    e.target.currentTime = seekTime;
-    e.target.muted = true;
-  });
-  g.video.addEventListener('seeked', function(e) {
-//    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
-    e.target.play();
-  });
-  g.video.addEventListener('playing', function(e) {
-    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
-    e.target.pause();
-  });
-  g.video.addEventListener('error', processNext);
+  function createLoadElements() {
+    var video = document.createElement("video");
+    var image = document.createElement("img");
+    var loadElements = {
+      video: video,
+      image: image,
+    };
 
-  g.image.addEventListener('load', function(e) {
-    makeThumbnail(e.target, e.target.naturalWidth, e.target.naturalHeight, isGif(e.target.src) ? "gif" : "");
-  });
-  g.image.addEventListener('error', processNext);
+    var processNextWithThis = function() {
+      processNext(loadElements);
+    };
+
+    video.addEventListener('loadedmetadata', function(e) {
+      var seekTime = Math.min(g.maxSeekTime, e.target.duration / 2);
+      e.target.currentTime = seekTime;
+      e.target.muted = true;
+    });
+    video.addEventListener('seeked', function(e) {
+  //    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+      e.target.play();
+    });
+    video.addEventListener('playing', function(e) {
+      makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+      e.target.pause();
+      processNextWithThis();
+    });
+    video.addEventListener('error', processNextWithThis);
+
+    image.addEventListener('load', function(e) {
+      makeThumbnail(e.target, e.target.naturalWidth, e.target.naturalHeight, isGif(e.target.src) ? "gif" : "");
+      processNextWithThis();
+    });
+    image.addEventListener('error', processNextWithThis);
+
+    processNextWithThis();
+  }
 
   function gotoNext(e) {
     e.preventDefault();
@@ -189,49 +225,195 @@
     viewImage(prev);
   }
 
-  function verticallyCenter(height) {
-    var dh = window.innerHeight - height;
-    g.viewElem.style.top = px(window.scrollY + ((dh > 0) ? (dh / 2 | 0) : 0));
+  function isRotated90() {
+    return g.rotation / 90 % 2 === 1;
+  }
+
+  function getDisplayDimensions() {
+    if (isRotated90()) {
+      return {
+        width: window.innerHeight,
+        height: window.innerWidth,
+      }
+    } else {
+      return {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }
+    }
+  }
+
+  function computeTransformAtCenter(elem, orig, width, height) {
+    var sx = width  / orig.width;
+    var sy = height / orig.height;
+    var scale = Math.max(sx, sy);
+
+    // If we did nothing, no scale, no translation, it would be here
+    //
+    //     +----+-------+
+    //     |    |       |
+    //     |    |       |
+    //     |    |       |
+    //     +----+       |
+    //     |            |
+    //     +------------+
+    //
+    // After scaling it could be one of these because it scales around the center of the image
+    //
+    //                         +------+
+    //     +------------+      |+-----+------+
+    //     |+--+        |      ||     |      |
+    //     ||  |        |      ||     |      |
+    //     ||  |        |  or  ||     |      |
+    //     |+--+        |      ||     |      |
+    //     |            |      ++-----+      |
+    //     +------------+       +------------+
+    //
+    //
+    var displayCenterX = window.innerWidth  / 2;
+    var displayCenterY = window.innerHeight / 2
+
+    var imgDisplayWidth  = isRotated90() ? height : width;
+    var imgDisplayHeight = isRotated90() ? width  : height;
+
+    var origCenterX = orig.width  / 2;
+    var origCenterY = orig.height / 2;
+
+    var x = displayCenterX - origCenterX;
+    var y = displayCenterY - origCenterY;
+
+    var newLeft = origCenterX + x - (imgDisplayWidth  / 2);
+    var newTop  = origCenterY + y - (imgDisplayHeight / 2);
+
+    return {
+      x: x,
+      y: y,
+      scale: scale,
+      s: {
+        x: sx,
+        y: sy,
+      },
+      displayCenter: {
+        x: displayCenterX,
+        y: displayCenterY,
+      },
+      imgDisplay: {
+        w: imgDisplayWidth,
+        h: imgDisplayHeight,
+      },
+      origCenter: {
+        x: origCenterX,
+        y: origCenterY,
+      },
+      newMin: {
+        x: newLeft,
+        y: newTop,
+      },
+    };
+  }
+
+  function setTransform(elem, t) {
+    var translationPart = "translate(" + px(t.x) + "," + px(t.y + window.scrollY) + ")";
+
+    //var scalePart = "scaleX(" + t.s.x + ") scaleY(" + t.s.y + ")";
+    var scalePart = "scale(" + Math.max(t.scale) + ")";
+
+    var rotatePart = "rotate(" + g.rotation + "deg)";
+
+    elem.style.transform = translationPart + rotatePart + scalePart;
     g.viewElem.style.display = "block";
   }
 
-  function actualSize(elem, width, height) {
-    var w = width;
-    var h = height;
-    elem.style.width  = px(w);
-    elem.style.height = px(h);
-    verticallyCenter(h);
-  }
+//  if (newLeft <= 0) {
+//    // it's off the left so move it right
+//    x = -newLeft;
+//    if (imgDisplayWidth < window.innerWidth) {
+//      x += (window.innerWidth - imgDisplayWidth) / 2;
+//    }
+//  } else {
+//    // it's right from the left so center
+//    x = displayCenterX - origCenterX;
+//  }
+//
+//  if (newTop <= 0) {
+//    // It's off the top so move it down
+//    y = -newTop;
+//    if (imgDisplayHeight < window.innerHeight) {
+//      y += (window.innerHeight - imgDisplayHeight) / 2;
+//    }
+//  } else {
+//    // It's down from top so center
+//    y = displayCenterY - origCenterY;
+//  }
 
-  function sizeToFit(elem, width, height) {
-    var w = width  / window.innerWidth;
-    var h = height / window.innerHeight;
-    if (w < h) {
-      w = width * window.innerHeight / height | 0;
-      h = window.innerHeight;
-    } else {
-      w = window.innerWidth;
-      h = height * window.innerWidth / width | 0;
+  function moveIfOffScreen(t, axis, dimension) {
+    if (t.newMin[axis] < 0) {
+      t[axis] -= t.newMin[axis];
     }
-    elem.style.width  = px(w);
-    elem.style.height = px(h);
-    verticallyCenter(h);
   }
 
-  function fitWidth(elem, width, height) {
-    var w = window.innerWidth;
-    var h = height * w / width | 0;
-    elem.style.width  = px(w);
-    elem.style.height = px(h);
-    verticallyCenter(h);
+  function actualSize(elem, orig) {
+    var w = orig.width;
+    var h = orig.height;
+    var t = computeTransformAtCenter(elem, orig, w, h);
+
+    // center if smaller
+    // move left if wider than display
+    // move down if taller than display
+    moveIfOffScreen(t, 'x', 'w');
+    moveIfOffScreen(t, 'y', 'h');
+    setTransform(elem, t);
   }
 
-  function fitHeight(elem, width, height) {
-    var h = window.innerHeight;
-    var w = width * h / height | 0;
-    elem.style.width  = px(w);
-    elem.style.height = px(h);
-    verticallyCenter(h);
+  function sizeToFit(elem, orig) {
+    var display = getDisplayDimensions();
+    var w = orig.width  / display.width;
+    var h = orig.height / display.height;
+    if (w < h) {
+      w = orig.width * display.height / orig.height | 0;
+      h = display.height;
+    } else {
+      w = display.width;
+      h = orig.height * display.width / orig.width | 0;
+    }
+    var t = computeTransformAtCenter(elem, orig, w, h);
+
+    // it fits on display so nothing to do
+    setTransform(elem, t);
+  }
+
+  function fitWidth(elem, orig) {
+    var display = getDisplayDimensions();
+    var w = display.width;
+    var h = orig.height * w / orig.width | 0;
+    var t = computeTransformAtCenter(elem, orig, w, h);
+
+    // it fits width wise
+    // if height shorter than display done (it's centered)
+    // if height taller than display move down
+    if (isRotated90()) {
+      moveIfOffScreen(t, 'x', 'w');
+    } else {
+      moveIfOffScreen(t, 'y', 'h');
+    }
+    setTransform(elem, t);
+  }
+
+  function fitHeight(elem, orig) {
+    var display = getDisplayDimensions();
+    var h = display.height;
+    var w = orig.width * h / orig.height | 0;
+    var t = computeTransformAtCenter(elem, orig, w, h);
+
+    // it fits height wise
+    // if width is thinner than dispaly done (it's centered)
+    // if width is wider than display move right
+    if (isRotated90()) {
+      moveIfOffScreen(t, 'y', 'h');
+    } else {
+      moveIfOffScreen(t, 'x', 'w');
+    }
+    setTransform(elem, t);
   }
 
   function makeThumbnail(elem, elemWidth, elemHeight, msg) {
@@ -249,18 +431,17 @@
       ctx.fillText(msg, 5, 5);
       loadImage(elem.src, ctx.canvas.toDataURL());
     }
-    processNext();
   }
 
-  function processNext() {
+  function processNext(loadElements) {
     if (g.queue.length) {
       var url = g.queue.shift();
       if (isVideoExtension(url)) {
-        g.video.pause();
-        g.video.src = url;
-        g.video.load();
+        loadElements.video.pause();
+        loadElements.video.src = url;
+        loadElements.video.load();
       } else {
-        g.image.src = url;
+        loadElements.image.src = url;
       }
     }
   }

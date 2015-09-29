@@ -7,6 +7,9 @@
       margin: 0;
       font-family: monospace;
     }
+    video, img {
+      max-width: none;
+    }
     #grid {
       width: 95%;
       margin: auto;
@@ -18,7 +21,6 @@
         z-index: 2;
         width: 100%;
         height: 100%;
-        text-align: center;
     }
     #back {
         position: fixed;
@@ -37,10 +39,10 @@
         z-index: 3;
     }
     #viewer-img {
-        max-width: 100%;
+        gmax-width: 100%;
     }
     #viewer-video {
-        max-width: 100%;
+        gmax-width: 100%;
     }
     #next, #prev {
         position: fixed;
@@ -98,6 +100,14 @@
       color: rgba(255,255,255,0.8);
       background-color: rgba(0, 0, 0, 0.5);
     }
+    #ui img {
+        width: 40px;
+        height: 40px;
+        opacity: 0.5;
+    }
+    #ui img:hover {
+        opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -107,13 +117,23 @@
 <div id="viewer">
     <div id="back"></div>
     <div id="view-holder">
-      <img id="viewer-img" />
-      <video id="viewer-video" autoplay controls loop></video>
+      <div id="viewer-content">
+          <img id="viewer-img" />
+          <video id="viewer-video" autoplay controls loop></video>
+      </div>
       <div id="info"></div>
       <div id="prev"><div>&lt;</div></div>
       <div id="next"><div>&gt;</div></div>
       <div id="ui">
-        <div id="w">&lt;-&gt;</div>&nbsp;<div id="h">&lt;-&gt;</div>
+        <div id="stretch">
+          <img id="stretch-0" src="images/stretch-none.svg" />
+          <img id="stretch-1" src="images/stretch-horizontal.svg" />
+          <img id="stretch-2" src="images/stretch-vertical.svg" />
+          <img id="stretch-3" src="images/stretch-both.svg" />
+        </div>
+        <div id="rotate">
+          <img src="images/rotate.svg" />
+        </div>
       </div>
     </div>
 </div>
