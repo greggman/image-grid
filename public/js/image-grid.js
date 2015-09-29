@@ -14,6 +14,7 @@
     widthMode: 1,    // 0 = leave as is, 1 = fitWidth
     heightMode: 1,   // 0 = leave as is, 1 = fitHeight
     padding: 10,
+    maxSeekTime: 5,
   };
 
   g.elem = $("grid");
@@ -145,8 +146,18 @@
     }
   });
 
-  g.video.addEventListener('canplay', function(e) {
+  g.video.addEventListener('loadedmetadata', function(e) {
+    var seekTime = Math.max(g.maxSeekTime, e.target.duration / 2);
+    e.target.currentTime = seekTime;
+    e.target.muted = true;
+    e.target.play();
+  });
+  g.video.addEventListener('seeked', function(e) {
     makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+  });
+  g.video.addEventListener('playing', function(e) {
+    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+    e.target.pause();
   });
   g.video.addEventListener('error', processNext);
 
