@@ -32,7 +32,10 @@
   g.queue = [];
   g.video = document.createElement("video");
   g.image = document.createElement("img");
+  g.infoNode = document.createTextNode("");
   g.viewing = false;
+
+  $("info").appendChild(g.infoNode);
 
   misc.applyUrlSettingsDirect(g);
 
@@ -254,7 +257,6 @@
       var url = g.queue.shift();
       if (isVideoExtension(url)) {
         g.video.pause();
-        //g.video.currentTime = 0;
         g.video.src = url;
         g.video.load();
       } else {
@@ -285,10 +287,10 @@
     g.viewing = true;
     var url = img.origSrc;
     g.currentElem = img;
+    g.infoNode.nodeValue = url.substr(window.location.origin.length + "/images/".length);
     if (isVideoExtension(url)) {
       g.viewVideo.pause();
       g.viewVideo.src = url;
-//      g.viewVideo.currentTime = 0;
       g.viewVideo.load();
       g.displayElem = g.viewVideo;
       g.uiElem.style.display = "none";

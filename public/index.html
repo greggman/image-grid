@@ -5,6 +5,7 @@
     html, body {
       height: 100%;
       margin: 0;
+      font-family: monospace;
     }
     #grid {
       width: 95%;
@@ -49,7 +50,6 @@
         justify-content: center;
         align-content: center;
         align-items: center;
-        font-family: monospace;
         font-size: 200px;
         height: 100%;
         width: 10%;
@@ -66,6 +66,20 @@
     }
     #next {
         right: 0;
+    }
+    #info {
+        position: fixed;
+        top: 0px;
+        width: 100%;
+        padding: 2em;
+        color: rgba(255,255,255,0);
+        background-color: rgba(255,0,0,0);
+        text-align: center;
+        z-index: 4;
+    }
+    #info:hover {
+        color: rgba(255,255,255,1);
+        background-color: rgba(0,0,0,0.5);
     }
     #ui {
         position: fixed;
@@ -95,6 +109,7 @@
     <div id="view-holder">
       <img id="viewer-img" />
       <video id="viewer-video" autoplay controls loop></video>
+      <div id="info"></div>
       <div id="prev"><div>&lt;</div></div>
       <div id="next"><div>&gt;</div></div>
       <div id="ui">
