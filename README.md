@@ -48,8 +48,23 @@ Then open a browser and go to `http://localhost:8080`
 *   Click again to close.
 *   Click on left of window to go to previous image (or press ⇦)
 *   Click on right of window to go to next image (or press ⇨)
-*   Click on `<->` to switch between stretching the width to fill the window
-*   Click on `^-V` to switch between stretching the height to fill the window
+*   Click on stretch icon to cycle between
+
+    <img src="public/images/stretch-both.svg" width="32" />
+    stretch to fit in both dimensions
+
+    <img src="public/images/stretch-none.svg" width="32" />
+    show in original size
+
+    <img src="public/images/stretch-horizontal.svg" width="32" />
+    stretch to fit width
+
+    <img src="public/images/stretch-vertical.svg" width="32" />
+    stretch to fit height
+
+*   Click on rotate icon to rotate in increments of 90 degrees
+
+    <img src="public/images/rotate.svg" width="32"
 
 ## Settings
 
