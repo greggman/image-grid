@@ -150,10 +150,10 @@
     var seekTime = Math.max(g.maxSeekTime, e.target.duration / 2);
     e.target.currentTime = seekTime;
     e.target.muted = true;
-    e.target.play();
   });
   g.video.addEventListener('seeked', function(e) {
-    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+//    makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
+    e.target.play();
   });
   g.video.addEventListener('playing', function(e) {
     makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
@@ -238,9 +238,11 @@
       var ctx = g.ctx;
       ctx.canvas.width = imageWidth;
       ctx.canvas.height = height;
-      ctx.fillStyle = "white";
-      ctx.textBaseline = "top";
       ctx.drawImage(elem, 0, 0, imageWidth, height);
+      ctx.textBaseline = "top";
+      ctx.fillStyle = "black";
+      ctx.fillText(msg, 4, 6);
+      ctx.fillStyle = "white";
       ctx.fillText(msg, 5, 5);
       loadImage(elem.src, ctx.canvas.toDataURL());
     }
@@ -252,7 +254,7 @@
       var url = g.queue.shift();
       if (isVideoExtension(url)) {
         g.video.pause();
-        g.video.currentTime = 0;
+        //g.video.currentTime = 0;
         g.video.src = url;
         g.video.load();
       } else {
@@ -286,7 +288,7 @@
     if (isVideoExtension(url)) {
       g.viewVideo.pause();
       g.viewVideo.src = url;
-      g.viewVideo.currentTime = 0;
+//      g.viewVideo.currentTime = 0;
       g.viewVideo.load();
       g.displayElem = g.viewVideo;
       g.uiElem.style.display = "none";
