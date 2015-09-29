@@ -56,15 +56,15 @@ Then open a browser and go to `http://localhost:8080`
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-none.svg" width="32" />
     show in original size
 
-    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-horizontal.sv" width="32" />
+    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-horizontal.svg" width="32" />
     stretch to fit width
 
-    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-vertical.sv" width="32" />
+    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-vertical.svg" width="32" />
     stretch to fit height
 
 *   Click on rotate icon to rotate in increments of 90 degrees
 
-    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-rotate.sv" width="32" />
+    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-rotate.svg" width="32" />
 
 ## Settings
 
