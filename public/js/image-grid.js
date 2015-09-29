@@ -14,7 +14,7 @@
     widthMode: 1,    // 0 = leave as is, 1 = fitWidth
     heightMode: 1,   // 0 = leave as is, 1 = fitHeight
     padding: 10,
-    maxSeekTime: 5,
+    maxSeekTime: 30,
   };
 
   g.elem = $("grid");
@@ -147,7 +147,7 @@
   });
 
   g.video.addEventListener('loadedmetadata', function(e) {
-    var seekTime = Math.max(g.maxSeekTime, e.target.duration / 2);
+    var seekTime = Math.min(g.maxSeekTime, e.target.duration / 2);
     e.target.currentTime = seekTime;
     e.target.muted = true;
   });
