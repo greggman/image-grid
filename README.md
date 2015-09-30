@@ -74,6 +74,9 @@ Then open a browser and go to `http://localhost:8080`
         4 = 1/3 speed
         5 = 1/4 speed
 
+Also note: There is "go fullscreen" button. If you want to go fullscreen pick it from the menus
+of your browser or press the appropriate hotkey.
+
 ## Settings
 
 Viewer settings can be set in the URL by adding `?setting=value&setting=value`. For example
@@ -90,6 +93,26 @@ any image below this size is not displayed. The default is 256. Note gifs ignore
 ### `padding`
 
 amount of padding to put between images. The default is 10.
+
+## TODO
+
+*   Make it work correctly on Safari
+
+    Safari is the new IE. It's now the shitty browser that doesn't follow standards and has bugs.
+    In this case Safari seems very unhappy with rotated and scaled videos. Where as Chrome and
+    Firefox seem to have no problem, in Safari if the video is larger than the page you can
+    not scroll over the the parts off the screen.
+
+    It might be possible to fix this by adding an extra non-video element to match the video?
+    No idea.
+
+    Also if the video is rotated, switching to
+    another video often doesn't show the video. You can here it playing but it's not visible.
+    Sometime scrolling down then scrolling back up exactly where you were a moment ago will
+    fix it. I have idea for a workaround.
+
+
+
 
 
 ## License
