@@ -64,7 +64,7 @@ Then open a browser and go to `http://localhost:8080`
 
 *   Click on rotate icon to rotate in increments of 90 degrees
 
-    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-rotate.svg" width="32" />
+    <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/rotate.svg" width="32" />
 
 ## Settings
 
