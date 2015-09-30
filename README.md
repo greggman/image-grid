@@ -66,6 +66,14 @@ Then open a browser and go to `http://localhost:8080`
 
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/rotate.svg" width="32" />
 
+*   Press 1, 2, 3, 4, or 5 to set the playback speed of videos
+
+        1 = normal speed
+        2 = 2/3rd speed
+        3 = 1/2 speed
+        4 = 1/3 speed
+        5 = 1/4 speed
+
 ## Settings
 
 Viewer settings can be set in the URL by adding `?setting=value&setting=value`. For example
