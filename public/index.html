@@ -2,6 +2,9 @@
 <html>
 <head>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     html, body {
       height: 100%;
       margin: 0;
@@ -108,6 +111,148 @@
     #ui img:hover {
         opacity: 0.8;
     }
+    #pspot {
+        position: fixed;
+        left: 50%;
+        margin-left: -37%;
+        bottom: 5px;
+        width: 75%;
+    }
+    .player {
+      width: 100%;
+      padding: 0.3em;
+      background-color: rgba(0,0,0,0.9);
+      color: white;
+
+      display: flex;
+      flex-flow: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+
+      /* FUCKING SAFARI >:( */
+      display: -webkit-flex;
+      -webkit-flex-flow: row;
+      -webkit-justify-content: center;
+      -webkit-align-content: center;
+      -webkit-align-items: center;
+
+      font-size: x-large;
+      opacity: 0;
+    }
+    .player:hover {
+      opacity: 0.8;
+    }
+    .player .play {
+      cursor: pointer;
+    }
+    .player .que {
+      flex-grow: 1;
+    }
+    .player .vol {
+      width: 100px;
+    }
+    .player .play,
+    .player .que,
+    .player .time,
+    .player .vol {
+      margin: 0.5em;
+    }
+
+.player input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 5px 0;
+  background-color: #000;
+}
+
+.player input[type=range]:focus {
+  outline: none;
+}
+.player input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  cursor: pointer;
+  background: #000000;
+  border-radius: 12px;
+  border: 2px solid #404040;
+}
+.player input[type=range]::-webkit-slider-thumb {
+  height: 20px;
+  width: 30px;
+  border-radius: 15px;
+  background: #c8c8c8;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6px;
+}
+.player input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #404040;
+}
+.player input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  cursor: pointer;
+  background: #000000;
+  border-radius: 12px;
+  border: 2px solid #404040;
+}
+.player input[type=range]::-moz-range-thumb {
+  height: 20px;
+  width: 30px;
+  border-radius: 15px;
+  background: #c8c8c8;
+  cursor: pointer;
+}
+.player input[type=range]::-ms-track {
+  width: 100%;
+  height: 12px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+.player input[type=range]::-ms-fill-lower {
+  background: #000000;
+  border: 1px solid #404040;
+  border-radius: 12px;
+}
+.player input[type=range]::-ms-fill-upper {
+  background: #000000;
+  border: 1px solid #404040;
+  border-radius: 12px;
+}
+.player input[type=range]::-ms-thumb {
+  height: 20px;
+  width: 30px;
+  border-radius: 15px;
+  background: #c8c8c8;
+  cursor: pointer;
+  height: 10px;
+}
+.player input[type=range]:focus::-ms-fill-lower {
+  background: #000000;
+}
+.player input[type=range]:focus::-ms-fill-upper {
+  background: #404040;
+}
+
+
+.player input[type=range].volume::-webkit-slider-thumb {
+  width: 20px;
+  background: #c8c8c8;
+}
+.player input[type=range].volume::-moz-range-thumb {
+  width: 20px;
+  background: #c8c8c8;
+}
+.player input[type=range].volume::-ms-thumb {
+  width: 32px;
+  background: #c8c8c8;
+}
+
+
+
   </style>
 </head>
 <body>
@@ -119,7 +264,7 @@
     <div id="view-holder">
       <div id="viewer-content">
           <img id="viewer-img" />
-          <video id="viewer-video" autoplay controls loop></video>
+          <video id="viewer-video" autoplay loop></video>
       </div>
       <div id="info"></div>
       <div id="prev"><div>&lt;</div></div>
@@ -133,6 +278,14 @@
         </div>
         <div id="rotate">
           <img src="images/rotate.svg" />
+        </div>
+      </div>
+      <div id="pspot">
+        <div class="player">
+          <div class="play"></div>
+          <input  class="que" type="range" min="0" max="10000" />
+          <div class="time"></div>
+          <div class="vol"><input class="volume" type="range" min="0" max="10000" value="10000" /></div>
         </div>
       </div>
     </div>
