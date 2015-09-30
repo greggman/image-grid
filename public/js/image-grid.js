@@ -257,17 +257,20 @@
   function changeStretchMode(e) {
     e.preventDefault();
     e.stopPropagation();
-    g.stretchMode = (g.stretchMode + 1) % 4;
-    updateStretch();
-    updateDisplayElem();
+    if (g.viewing) {
+      g.stretchMode = (g.stretchMode + 1) % 4;
+      updateStretch();
+      updateDisplayElem();
+    }
   }
 
   function rotate(e) {
     e.preventDefault();
     e.stopPropagation();
-    g.rotation = (g.rotation + 90) % 360;
-//    g.viewContent.style.transform = "rotate(" + g.rotation + "deg)";
-    updateDisplayElem();
+    if (g.viewing) {
+      g.rotation = (g.rotation + 90) % 360;
+      updateDisplayElem();
+    }
   }
 
   function getOriginalSize(elem) {
@@ -312,6 +315,13 @@
     case 52: // 4  0.33
     case 53: // 5  0.25
       g.player.setPlaybackRate(rates[e.keyCode]);
+      break;
+    case 191: // /  rotate
+      rotate(e);
+      break;
+    case 190: // . strech
+      changeStretchMode(e);
+      break;
     }
   });
 
