@@ -75,7 +75,30 @@
     }
   });
 
+  function EventEmitter() {
+
+    var _handlers = {};
+
+    var _on = function(event, fn) {
+      _handlers[event] = fn;
+    };
+
+    var _emit = function(event) {
+      var handler = _handlers[event];
+      if (handler) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(null, arguments);
+      }
+    };
+
+    this.on = _on;
+    this.addEventListener = _on;
+    this.emit = _emit;
+  }
+
   function Player(video, uiElem) {
+    EventEmitter.call(this);
+    var _self = this;
     var $ = uiElem.querySelector.bind(uiElem);
     var _pauseIcon = "❚❚";
     var _playIcon = "▶";
@@ -91,6 +114,13 @@
     var _playNode = document.createTextNode(_playIcon);
     _playElem.appendChild(_playNode);
     var _playbackRate = 1;
+    var _newVideo;
+
+    var _load = function(url) {
+      _pause();
+      video.src = url;
+      video.load();
+    };
 
     var _play = function() {
       video.play();
@@ -110,6 +140,13 @@
 
     video.addEventListener('timeupdate', function() {
       _setTime();
+    });
+
+    video.addEventListener('canplay', function(e) {
+      _self.emit('canplay', e);
+    });
+    video.addEventListener('loadeddata', function(e) {
+      _self.emit('loadeddata', e);
     });
 
     _queElem.addEventListener('input', function() {
@@ -161,6 +198,7 @@
       video.playbackRate = rate;
     };
 
+    this.load = _load;
     this.play = _play;
     this.pause = _pause;
     this.setPlaybackRate = _setPlaybackRate;
@@ -171,12 +209,13 @@
   g.player = new Player(g.viewVideo, $("pspot"));
 
   g.viewElem.addEventListener('click', hideImage);
-  g.viewVideo.addEventListener('canplay', function(e) {
-    g.viewVideo.style.display = "inline-block";
-    g.viewImg.style.display = "none";
-    adjustSize(g.viewVideo, getOriginalSize(g.viewVideo));
-    g.player.play();
-  });
+//  g.viewVideo.addEventListener('canplay', function(e) {
+//console.log("canplay");
+//    g.viewVideo.style.display = "inline-block";
+//    g.viewImg.style.display = "none";
+//    adjustSize(g.viewVideo, getOriginalSize(g.viewVideo));
+//    g.player.play();
+//  });
   g.viewVideo.addEventListener('loadeddata', function(e) {
     g.viewVideo.style.display = "inline-block";
     g.viewImg.style.display = "none";
@@ -583,8 +622,7 @@
     g.infoNode.nodeValue = decodeURIComponent(url).substr(window.location.origin.length + "/images/".length);
     if (isVideoExtension(url)) {
       g.player.pause();
-      g.viewVideo.src = url;
-      g.viewVideo.load();
+      g.player.load(url);
       g.displayElem = g.viewVideo;
 //      g.uiElem.style.display = "none";
     } else {
