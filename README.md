@@ -96,6 +96,12 @@ amount of padding to put between images. The default is 10.
 
 ## TODO
 
+*   Make scroll to current thumbnail or at least keep thumbnail on page
+
+*   Make it sort (or at least optionally)
+
+*   Slideshow
+
 *   Make it work correctly on Safari
 
     Safari is the new IE. It's now the shitty browser that doesn't follow standards and has bugs.
