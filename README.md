@@ -48,7 +48,7 @@ Then open a browser and go to `http://localhost:8080`
 *   Click again to close.
 *   Click on left of window to go to previous image (or press ⇦)
 *   Click on right of window to go to next image (or press ⇨)
-*   Click on stretch icon to cycle between (or press `.`)
+*   Click on stretch icon to cycle between (or press `.` or `z`)
 
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-both.svg" width="32" />
     stretch to fit in both dimensions
@@ -62,7 +62,7 @@ Then open a browser and go to `http://localhost:8080`
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-vertical.svg" width="32" />
     stretch to fit height
 
-*   Click on rotate icon to rotate in increments of 90 degrees (or press `/`)
+*   Click on rotate icon to rotate in increments of 90 degrees (or press `/` or `a`)
 
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/rotate.svg" width="32" />
 
@@ -73,6 +73,12 @@ Then open a browser and go to `http://localhost:8080`
         3 = 1/2 speed
         4 = 1/3 speed
         5 = 1/4 speed
+
+*   Hover over top of window to show filename
+
+*   Hover over bottom of window to show video controls
+
+*   Press `q` to go forward 30 seconds, `w` to go backward 15 seconds.
 
 Also note: There is "go fullscreen" button. If you want to go fullscreen pick it from the menus
 of your browser or press the appropriate hotkey.
