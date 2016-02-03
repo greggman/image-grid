@@ -9,6 +9,8 @@
       height: 100%;
       margin: 0;
       font-family: monospace;
+      background-color: #444;
+      color: red;
     }
     video, img {
       max-width: none;
@@ -273,6 +275,9 @@
         <div id="rotate">
           <img src="images/rotate.svg" />
         </div>
+        <div id="close">
+          <img src="images/close.svg" />
+        </div>
       </div>
       <div id="pspot">
         <div class="player">
@@ -286,5 +291,6 @@
 </div>
 <div id="spacer"></div>
 </body>
+<script src="3rdparty/canvas-toBlob.js"></script>
 <script data-main="js/image-grid.js" src="3rdparty/require.js"></script>
 </html>

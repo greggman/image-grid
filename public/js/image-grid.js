@@ -15,6 +15,10 @@
     padding: 10,
     maxSeekTime: 30,
     rotation: 0,
+    zoom: 1,
+    loop: 0,
+    loopStart: 0,
+    loopEnd: 0,
   };
   window.g = g;
 
@@ -26,6 +30,7 @@
   g.viewContent = $("viewer-content");
   g.nextElem = $("next");
   g.prevElem = $("prev");
+  g.closeElem = $("close");
   g.stretchElem = $("stretch");
   g.rotateElem = $("rotate");
   g.stretchImages = [
@@ -117,8 +122,12 @@
     _playElem.appendChild(_playNode);
     var _playbackRate = 1;
     var _newVideo;
+    var _loopStart = 0;
+    var _loopEnd = 0;
+    var _loop = false;
 
     var _load = function(url) {
+      _loop = false;
       _pause();
       video.src = url;
       video.load();
@@ -145,6 +154,11 @@
     });
 
     video.addEventListener('timeupdate', function() {
+      if (_loop) {
+        if (video.currentTime >= _loopEnd) {
+          video.currentTime = _loopStart;
+        }
+      }
       _setTime();
     });
 
@@ -204,18 +218,31 @@
       video.playbackRate = rate;
     };
 
+    var _setLoop = function(start, end) {
+      _loop = true;
+      _loopStart = Math.min(video.duration, Math.max(0, start));
+      _loopEnd = Math.min(video.duration, Math.max(0, end));
+    };
+
+    var _clearLoop = function() {
+      _loop = false;
+    };
+
     this.load = _load;
     this.play = _play;
     this.pause = _pause;
     this.que = _que;
     this.setPlaybackRate = _setPlaybackRate;
+    this.setLoop = _setLoop;
+    this.clearLoop = _clearLoop;
 
     _setTime(0);
   }
 
   g.player = new Player(g.viewVideo, $("pspot"));
 
-  g.viewElem.addEventListener('click', hideImage);
+  g.closeElem.addEventListener('click', hideImage);
+//  g.viewElem.addEventListener('click', hideImage);
 //  g.viewVideo.addEventListener('canplay', function(e) {
 //console.log("canplay");
 //    g.viewVideo.style.display = "inline-block";
@@ -280,6 +307,38 @@
     }
   }
 
+  function zoom(z) {
+    if (g.viewing) {
+      g.zoom += z;
+      updateDisplayElem();
+    }
+  }
+
+  function loop() {
+    if (g.displayElem instanceof HTMLVideoElement) {
+      switch (g.loop) {
+        case 0:  // not looping, set start
+          g.loop = 1;
+          g.loopStart = g.displayElem.currentTime;
+          break;
+        case 1:  // start set, set end
+          g.loop = 2;
+          g.loopEnd = g.displayElem.currentTime;
+          if (g.loopStart > g.loopEnd) {
+            var t = g.loopStart;
+            g.loopStart = g.loopEnd;
+            g.loopEnd = t;
+          }
+          g.player.setLoop(g.loopStart, g.loopEnd);
+          break;
+        case 2:
+          g.loop = 0;
+          g.player.clearLoop();
+          break;
+      }
+    }
+  }
+
   function getOriginalSize(elem) {
     return {
       width:  elem.naturalWidth  || elem.videoWidth,
@@ -300,7 +359,17 @@
   };
   window.addEventListener('keydown', function(e) {
     e.preventDefault();
+//console.log(e.keyCode);
     switch (e.keyCode) {
+    case 112:  // F1
+      zoom(0.1);
+      break;
+    case 113:  // F2
+      zoom(-0.1);
+      break;
+    case 76: // loop
+      loop();
+      break;
     case 37: // left
     case 16: // left-shift
       gotoPrev(e);
@@ -347,6 +416,7 @@
     case 90: // z strech
       changeStretchMode(e);
       break;
+
     }
   });
 
@@ -464,7 +534,7 @@
   function computeTransformAtCenter(elem, orig, width, height) {
     var sx = width  / orig.width;
     var sy = height / orig.height;
-    var scale = Math.max(sx, sy);
+    var scale = Math.max(sx, sy) * g.zoom;
 
     // If we did nothing, no scale, no translation, it would be here
     //
@@ -695,13 +765,17 @@
       ctx.fillText(msg, 4, 6);
       ctx.fillStyle = "white";
       ctx.fillText(msg, 5, 5);
-      loadImage(elem.src, ctx.canvas.toDataURL(), elem.orig.ndx);
+      ctx.canvas.toBlob(function(blob) {
+        var url = URL.createObjectURL(blob);
+        loadImage(elem.src, url, elem.orig.ndx);
+      });
     }
   }
 
   function processNext(loadElements) {
     if (g.queue.length) {
       var url = g.queue.shift();
+console.log(url);
       var orig = {
         ndx: g.imgCount++,
       };
@@ -762,6 +836,7 @@
     g.currentElem = img;
     g.infoNode.nodeValue = decodeURIComponent(url).substr(window.location.origin.length + "/images/".length);
     if (isVideoExtension(url)) {
+      g.loop = 0;
       g.player.pause();
       g.player.load(url);
       g.displayElem = g.viewVideo;
