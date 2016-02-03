@@ -12,7 +12,7 @@ images from one or more folder trees. It then serves those images and a simple v
 The viewer reads the list of images and then proceeds to download each one, generate
 a thumbnail and place the thumbnails in columns.
 
-Click an image to see it larger. Click again to close.
+Click an image to see it larger. Click the X to close.
 
 Videos are also supported.
 
@@ -45,7 +45,7 @@ Then open a browser and go to `http://localhost:8080`
 ## Usage
 
 *   Click an image to view it.
-*   Click again to close.
+*   Click X to close.
 *   Click on left of window to go to previous image (or press `⇦` or left shift)
 *   Click on right of window to go to next image (or press `⇨` or left ctrl)
 *   Click on stretch icon to cycle between the following (or press `.` or `z`)
@@ -78,7 +78,9 @@ Then open a browser and go to `http://localhost:8080`
 
 *   Hover over bottom of window to show video controls
 
-*   Press `q` to go forward 30 seconds, `w` to go backward 15 seconds.
+*   Press `q` or `tab` to go forward 30 seconds, `w` or `backtick` to go backward 15 seconds.
+
+*   Press `l` to set a loop start point, again to set the end and start looping, again to stop looping.
 
 Also note: There is "go fullscreen" button. If you want to go fullscreen pick it from the menus
 of your browser or press the appropriate hotkey.
