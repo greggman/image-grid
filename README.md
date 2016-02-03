@@ -46,9 +46,9 @@ Then open a browser and go to `http://localhost:8080`
 
 *   Click an image to view it.
 *   Click again to close.
-*   Click on left of window to go to previous image (or press ⇦)
-*   Click on right of window to go to next image (or press ⇨)
-*   Click on stretch icon to cycle between (or press `.` or `z`)
+*   Click on left of window to go to previous image (or press `⇦` or left shift)
+*   Click on right of window to go to next image (or press `⇨` or left ctrl)
+*   Click on stretch icon to cycle between the following (or press `.` or `z`)
 
     <img src="https://cdn.rawgit.com/greggman/image-grid/master/public/images/stretch-both.svg" width="32" />
     stretch to fit in both dimensions
