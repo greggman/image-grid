@@ -468,7 +468,10 @@
       e.target.pause();
       processNextWithThis();
     });
-    video.addEventListener('error', processNextWithThis);
+    video.addEventListener('error', function(e) {
+      console.error("could not load:", e.target.src, e);
+      processNextWithThis();
+    });
 
     image.addEventListener('load', function(e) {
       makeThumbnail(e.target, e.target.naturalWidth, e.target.naturalHeight, isGif(e.target.src) ? "gif" : "");
