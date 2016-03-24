@@ -62,6 +62,7 @@
   var videoExtensions = {
     ".webm": true,
     ".mp4": true,
+    ".m4v": true,
     ".ogv": true,
   };
   function isVideoExtension(filename) {
