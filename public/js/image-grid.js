@@ -180,13 +180,15 @@
       video.volume = _volumeElem.value / 10000;
     });
 
-    _playElem.addEventListener('click', function() {
+     function togglePlay() {
       if (video.paused) {
         _play();
       } else {
         _pause();
       }
-    });
+    }
+
+    _playElem.addEventListener('click', togglePlay);
 
     var _padZero = function(num, size) {
       var s = "00000" + num;
@@ -371,21 +373,24 @@
     case 76: // loop
       loop();
       break;
-    case 37: // left
     case 16: // left-shift
       gotoPrev(e);
       break;
-    case 39: // right
     case 17: // left control
       gotoNext(e);
       break;
+    case 32:
+      togglePlay();
+      break;
     case 9:  // tab
     case 81: // q
-      cue(30);
+    case 39: // right
+      cue(10);
       break;
+    case 37: // left
     case 192: // tilda
     case 87: // w
-      cue(-15);
+      cue(-5);
       break;
     case 38: // up
       e.preventDefault();
