@@ -466,10 +466,16 @@
     video.addEventListener('playing', function(e) {
       makeThumbnail(e.target, e.target.videoWidth, e.target.videoHeight, "▶︎");
       e.target.pause();
+    });
+    video.addEventListener('pause', function(e) {
+      e.target.removeAttribute('src');
+      e.target.load();
       processNextWithThis();
     });
     video.addEventListener('error', function(e) {
       console.error("could not load:", e.target.src, e);
+      e.target.removeAttribute('src');
+      e.target.load();
       processNextWithThis();
     });
 
