@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -15,38 +15,52 @@
     video, img {
       max-width: none;
     }
-    #spacer {
+    .spacer {
     }
-    #grid {
-      width: 95%;
+    .grid {
+      width: 100%;
+      height: 100%;
       margin: auto;
       position: relative;
+      overflow: scroll;
     }
-    #viewer {
-        display: none;
+    #viewers {
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+    }
+    .vpair {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+    .viewer {
         position: absolute;
-        z-index: 2;
+        gz-index: 2;
+        display: none;
+        top: 0;
         width: 100%;
         height: 100%;
     }
-    #back {
-        position: fixed;
+    .back {
+        position: absolute;
         top: 0;
-        left: 0;
         background-color: rgba(0,0,0,0.7);
         width: 100%;
         height: 100%;
     }
-    #view-holder {
+    .view-holder {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 3;
+        gz-index: 3;
     }
-    #next, #prev {
-        position: fixed;
+    .next, .prev {
+        position: absolute;
         top: 0;
         display: flex;
         flex-flow: column;
@@ -58,59 +72,71 @@
         width: 10%;
         color: rgba(255,255,255,0);
         background-color: rgba(255,0,0,0);
-        z-index: 4;
+        gz-index: 4;
     }
-    #next:hover, #prev:hover {
+    .next:hover, .prev:hover {
         color: rgba(255,255,255,0.3);
         background-color: rgba(0,0,0,0.1);
     }
-    #prev {
+    .prev {
         left: 0;
     }
-    #next {
+    .next {
         right: 0;
     }
-    #info {
-        position: fixed;
+    .tick {
+        position: absolute;
+        left: 0;
+        top: 0;
+        vertical-align: top;
+        color: rgba(0,255,255,0.3);
+        display: none;
+    }
+    .info {
+        position: absolute;
         top: 0px;
         width: 100%;
         padding: 2em;
         color: rgba(255,255,255,0);
         background-color: rgba(255,0,0,0);
         text-align: center;
-        z-index: 4;
+        gz-index: 4;
     }
-    #info:hover {
+    .info:hover {
         color: rgba(255,255,255,1);
         background-color: rgba(0,0,0,0.5);
     }
-    #ui {
-        position: fixed;
+    .ui {
+        position: absolute;
         top: 10px;
         right: 10px;
-        z-index: 5;
+        gz-index: 5;
         font-family: monospace;
         font-size: 20px;
         color: rgba(255,255,255,0.3);
         cursor: pointer;
+        opacity: 0.0;
     }
-    #h {
+    .ui:hover {
+        opacity: 1.0;
+    }
+    .h {
         transform: rotate(90deg);
     }
-    #w:hover, #h:hover {
+    .w:hover, .h:hover {
       color: rgba(255,255,255,0.8);
       background-color: rgba(0, 0, 0, 0.5);
     }
-    #ui img {
+    .ui img {
         width: 40px;
         height: 40px;
-        opacity: 0.5;
+        opacity: 0.4;
     }
-    #ui img:hover {
+    .ui img:hover {
         opacity: 0.8;
     }
-    #pspot {
-        position: fixed;
+    .pspot {
+        position: absolute;
         left: 50%;
         margin-left: -37%;
         bottom: 5px;
@@ -254,42 +280,47 @@
   </style>
 </head>
 <body>
-<div id="grid"></div>
-<div id="viewer">
-    <div id="back"></div>
-    <div id="view-holder">
-      <div id="viewer-content">
-          <img id="viewer-img" />
-          <video id="viewer-video" autoplay loop></video>
-      </div>
-      <div id="info"></div>
-      <div id="prev"><div>&lt;</div></div>
-      <div id="next"><div>&gt;</div></div>
-      <div id="ui">
-        <div id="stretch">
-          <img id="stretch-0" src="images/stretch-none.svg" />
-          <img id="stretch-1" src="images/stretch-horizontal.svg" />
-          <img id="stretch-2" src="images/stretch-vertical.svg" />
-          <img id="stretch-3" src="images/stretch-both.svg" />
+<div id="viewers">
+  <div class="vpair">
+    <div class="grid"></div>
+    <div class="viewer">
+        <div class="back"></div>
+        <div class="view-holder">
+          <div class="viewer-content">
+              <img class="viewer-img" />
+              <video class="viewer-video" autoplay loop></video>
+          </div>
+          <div class="info"></div>
+          <div class="prev"><div>&lt;</div></div>
+          <div class="next"><div>&gt;</div></div>
+          <div class="ui">
+            <div class="stretch">
+              <img class="stretch-0" src="images/stretch-none.svg" />
+              <img class="stretch-1" src="images/stretch-horizontal.svg" />
+              <img class="stretch-2" src="images/stretch-vertical.svg" />
+              <img class="stretch-3" src="images/stretch-both.svg" />
+            </div>
+            <div class="rotate">
+              <img src="images/rotate.svg" />
+            </div>
+            <div class="close">
+              <img src="images/close.svg" />
+            </div>
+          </div>
+          <div class="pspot">
+            <div class="player">
+              <div class="play"></div>
+              <input  class="que" type="range" min="0" max="10000" />
+              <div class="time"></div>
+              <div class="vol"><input class="volume" type="range" min="0" max="10000" value="10000" /></div>
+            </div>
+          </div>
         </div>
-        <div id="rotate">
-          <img src="images/rotate.svg" />
-        </div>
-        <div id="close">
-          <img src="images/close.svg" />
-        </div>
-      </div>
-      <div id="pspot">
-        <div class="player">
-          <div class="play"></div>
-          <input  class="que" type="range" min="0" max="10000" />
-          <div class="time"></div>
-          <div class="vol"><input class="volume" type="range" min="0" max="10000" value="10000" /></div>
-        </div>
-      </div>
     </div>
+    <div class="tick">◤</div>
+    <div class="spacer"></div>
+  </div>
 </div>
-<div id="spacer"></div>
 </body>
 <script src="3rdparty/canvas-toBlob.js"></script>
 <script data-main="js/image-grid.js" src="3rdparty/require.js"></script>
