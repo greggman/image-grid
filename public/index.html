@@ -74,9 +74,17 @@
         background-color: rgba(255,0,0,0);
         gz-index: 4;
     }
+    .prev img,
+    .next img {
+        opacity: 0;
+    }
     .next:hover, .prev:hover {
         color: rgba(255,255,255,0.3);
         background-color: rgba(0,0,0,0.1);
+    }
+    .prev:hover img,
+    .next:hover img {
+        opacity: 0.4;
     }
     .prev {
         left: 0;
@@ -291,8 +299,8 @@
               <video class="viewer-video" autoplay loop></video>
           </div>
           <div class="info"></div>
-          <div class="prev"><div>&lt;</div></div>
-          <div class="next"><div>&gt;</div></div>
+          <div class="prev"><img src="images/prev.svg" /></div>
+          <div class="next"><img src="images/next.svg" /></div>
           <div class="ui">
             <div class="stretch">
               <img class="stretch-0" src="images/stretch-none.svg" />
