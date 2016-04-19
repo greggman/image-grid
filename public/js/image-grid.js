@@ -1,9 +1,11 @@
 ﻿requirejs([
     './io',
     './misc',
+    './tree-client',
   ], function(
     io,
-    misc) {
+    misc,
+    TreeClient) {
 
   var $ = document.getElementById.bind(document);
   var viewersElem = $("viewers");
@@ -20,6 +22,7 @@
     currentVPairNdx: 0,
     viewsAcross: 1,
     viewsDown: 1,
+    freeLoadElements: [],
   };
 window.g = g;
   misc.applyUrlSettingsDirect(g);
@@ -56,13 +59,6 @@ window.g = g;
   function euclideanModulo(n, m) {
     return ((n % m) + m) % m;
   }
-
-  io.sendJSON("/images", {}, function(err, images) {
-    Array.prototype.push.apply(g.queue, images);
-    for (var ii = 0; ii < g.maxParallelDownloads; ++ii) {
-      createLoadElements();
-    }
-  });
 
   function EventEmitter() {
 
@@ -951,8 +947,9 @@ window.g = g;
       image: image,
     };
 
-    var processNextWithThis = function() {
-      processNext(loadElements);
+    var free = function() {
+      g.freeLoadElements.push(loadElements);
+      processNext();
     };
 
     video.addEventListener('loadedmetadata', function(e) {
@@ -970,22 +967,21 @@ window.g = g;
     video.addEventListener('pause', function(e) {
       e.target.removeAttribute('src');
       e.target.load();
-      processNextWithThis();
+      free();
     });
     video.addEventListener('error', function(e) {
       console.error("could not load:", e.target.src, e);
       e.target.removeAttribute('src');
       e.target.load();
-      processNextWithThis();
+      free();
     });
 
     image.addEventListener('load', function(e) {
       makeThumbnail(e.target, e.target.naturalWidth, e.target.naturalHeight, isGif(e.target.src) ? "gif" : "");
-      processNextWithThis();
+      free();
     });
-    image.addEventListener('error', processNextWithThis);
-
-    processNextWithThis();
+    image.addEventListener('error', free);
+    free();
   }
 
   function makeThumbnail(elem, elemWidth, elemHeight, msg) {
@@ -1008,8 +1004,12 @@ window.g = g;
     }
   }
 
-  function processNext(loadElements) {
+  function processNext() {
+    if (!g.freeLoadElements.length) {
+      return;
+    }
     if (g.queue.length) {
+      var loadElements = g.freeLoadElements.shift();
       var url = g.queue.shift();
 console.log(url);
       var orig = {
@@ -1035,6 +1035,32 @@ console.log(url);
     g.vPairs.forEach(function(vPair, pairNdx) {
       vPair.loadImage(src, url, ndx);
     });
+  }
+
+  for (var ii = 0; ii < g.maxParallelDownloads; ++ii) {
+    createLoadElements();
+  }
+//  io.sendJSON("/images", {}, function(err, images) {
+//    Array.prototype.push.apply(g.queue, images);
+//  });
+
+  var client = new TreeClient();
+  client.addEventListener('connect', () => { console.log("ws connected"); });
+  client.addEventListener('disconnect', () => { console.log("ws disconnected"); });
+  client.addEventListener('change', (d) => { show('change', d); });
+  client.addEventListener('remvoe', (d) => { show('remove', d); });
+
+  client.addEventListener('add', (d) => {
+    show('add', d);
+    if (!d.isDir) {
+      g.queue.push(d.name);
+      processNext();
+    }
+  });
+
+
+  function show(event, data) {
+    console.log(event, data.name, data.isDir);
   }
 });
 

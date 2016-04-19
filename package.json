@@ -15,7 +15,10 @@
   "author": "Gregg Tavares",
   "license": "MIT",
   "dependencies": {
+    "debug": "^2.2.0",
     "express": "^4.13.3",
-    "optionator": "^0.6.0"
+    "optionator": "^0.6.0",
+    "thewatcher": "git+https://github.com/greggman/thewatcher.git#50946ce",
+    "ws": "^1.1.0"
   }
 }

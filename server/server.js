@@ -32,9 +32,11 @@
 'use strict';
 
 var express = require('express');
+var filters = require('./filters');
 var http = require('http');
 var path = require('path');
 var readDirTree = require('../lib/readdirtree');
+var TreeServer = require('./tree-server');
 
 var optionSpec = {
   options: [
@@ -51,28 +53,13 @@ var optionSpec = {
 
 var optionator = require('optionator')(optionSpec);
 
-var imageExtensions = {
-  ".jpg": true,
-  ".jpeg": true,
-  ".png": true,
-  ".gif": true,
-  ".webp": true,
-};
-
-var videoExtensions = {
-  ".webm": true,
-  ".mp4": true,
-  ".m4v": true,
-  ".ogv": true,
-};
-
 function init(options) {
   var app = express();
 
   var images = [];
   options._.forEach(function(dirPath, ndx) {
     var files = readDirTree.sync(dirPath);
-    images = images.concat(files.filter(isImageOrVideoExtension).map(function(image) {
+    images = images.concat(files.filter(filters.isImageOrVideoExtension).map(function(image) {
       return path.join("images", ndx.toString(), image).replace(/\\/g, '/');
     }));
     console.log(dirPath, "images:", images.length);
@@ -91,6 +78,9 @@ function init(options) {
   tryToStartServer();
 
   function serverListeningHandler() {
+    var treeServer = new TreeServer(server, {
+      dirs: options._,
+    });
     console.log("Go To http://" + options.host + ":" + options.port);
   };
 
@@ -102,18 +92,6 @@ function init(options) {
   function tryToStartServer() {
     server.listen(options.port, options.host);
   }
-}
-
-function isImageExtension(filename) {
-  return imageExtensions[path.extname(filename).toLowerCase()];
-}
-
-function isVideoExtension(filename) {
-  return videoExtensions[path.extname(filename).toLowerCase()];
-}
-
-function isImageOrVideoExtension(filename) {
-  return isImageExtension(filename) || isVideoExtension(filename);
 }
 
 try {
