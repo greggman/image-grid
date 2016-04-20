@@ -3,7 +3,7 @@
 const filters = require('./filters');
 const fs = require('fs');
 const path = require('path');
-const TheWatcher = require('thewatcher');
+const SimpleTreeWatcher = require('simple-tree-watcher');
 const WebSocketServer = require('./websocket-server');
 
 class TreeWatcher {
@@ -63,7 +63,7 @@ class TreeServer {
     this._clients = [];
     this._entries = new Map();
     this._watchers = options.dirs.map((dir, ndx) => {
-      var watcher = new TheWatcher(dir, { filter: isImageOrVideoExtensionOrDirNotDot });
+      var watcher = new SimpleTreeWatcher(dir, { filter: isImageOrVideoExtensionOrDirNotDot });
       watcher.on('add',    (f, s)     => { this._onAdd   (dir, ndx, f, s    ); });
       watcher.on('create', (f, s)     => { this._onCreate(dir, ndx, f, s    ); });
       watcher.on('remove', (f, s, s2) => { this._onRemove(dir, ndx, f, s, s2); });
