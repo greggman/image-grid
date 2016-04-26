@@ -257,6 +257,8 @@ window.g = g;
       $(".stretch-2"),
       $(".stretch-3"),
     ];
+    _l.numLoading = 0;
+    _l.finishedLoading = false;
     _l.uiElem = $(".ui");
     _l.infoNode = document.createTextNode("");
     _l.viewing = false;
@@ -750,9 +752,14 @@ window.g = g;
     }
 
     function loadImage(src, url, ndx) {
+      ++_l.numLoading;
       var img = new Image();
       img.addEventListener('load', function() {
         addElement(img, img.naturalWidth, img.naturalHeight);
+        --_l.numLoading;
+        if (_l.numLoading === 0 && _l.finishedLoading) {
+          sortByNdx();
+        }
       });
       img.addEventListener('click', function() {
         viewImage(img);
@@ -789,9 +796,32 @@ window.g = g;
       }
     }
 
+    var padding = "0000000000";
+    function padLeft10(str) {
+      return padding.substr(padding.length - (10 - str.length)) + str;
+    }
+
+    function createSortName(name) {
+      var parts = name.split(/(\d+)/);
+      for (var ii = 1; ii < parts.length; ii += 2) {
+        parts[ii] = padLeft10(parts[ii]);
+      }
+      return parts.join('');
+    }
+
+    function getSortName(orig) {
+      if (!orig.sortName) {
+        orig.sortName = createSortName(orig.src);
+      }
+      return orig.sortName;
+    }
+
     function sortByNdx() {
+      console.log("sort");
       _l.images.sort(function(a, b) {
-          return a.orig.ndx - b.orig.ndx;
+          var aStr = getSortName(a.orig);
+          var bStr = getSortName(b.orig);
+          return aStr < bStr ? -1 : (aStr > bStr ? 1 : 0);
       });
       _l.images.forEach(function(a, ndx) {
           a.elemNdx = ndx;
@@ -799,7 +829,9 @@ window.g = g;
     }
 
     this.loadImage = loadImage;
-    this.finishedLoading = sortByNdx;
+    this.finishedLoading = () => {
+      _l.finishedLoading = true;
+    };
 
     var rates = {
       "49": 1,
