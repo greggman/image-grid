@@ -997,9 +997,11 @@ window.g = g;
       ctx.fillText(msg, 4, 6);
       ctx.fillStyle = "white";
       ctx.fillText(msg, 5, 5);
+      var src = elem.src;
+      var ndx = elem.orig.ndx;
       ctx.canvas.toBlob(function(blob) {
         var url = URL.createObjectURL(blob);
-        loadImages(elem.src, url, elem.orig.ndx);
+        loadImages(src, url, ndx);
       });
     }
   }
