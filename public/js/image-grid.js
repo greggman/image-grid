@@ -42,6 +42,7 @@ window.g = g;
   var videoExtensions = {
     ".webm": true,
     ".mp4": true,
+    ".mkv": true,
     ".m4v": true,
     ".ogv": true,
   };
