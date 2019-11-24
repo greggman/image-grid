@@ -1,6 +1,6 @@
 {
   "name": "image-grid",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Serve grid of images from folder tree",
   "main": "index.js",
   "scripts": {
